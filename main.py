@@ -2,6 +2,7 @@ from ortools.sat.python import cp_model
 from openpyxl import load_workbook
 import numpy as np
 
+'''
 wb = load_workbook('guest_seating_preferences_500.xlsx')
 sh = wb.active
 
@@ -38,3 +39,6 @@ for col in sh.iter_cols(min_col=1, max_col=1, min_row=2):
 for col in sh.iter_cols(min_col=3, max_col=3, min_row=2):
     for cell in col:
         visitorSize[cell.row-1] = cell.value
+'''
+
+

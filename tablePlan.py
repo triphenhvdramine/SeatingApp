@@ -24,11 +24,10 @@ def fitnessScore(arrangement, visitorPrefs, knownPositions):
     return score
 
 class tablePlan:
-    def __init__(self, seatingMap, affinityMatrix, friendsList, sizeList, numAnneals):
+    def __init__(self, seatingMap, friendsDict, sizeDict, numAnneals):
         self.seatingMap = seatingMap
-        self.affinityMatrix = affinityMatrix
-        self.friendsList = friendsList
-        self.sizeList = sizeList
+        self.friendsDict = friendsDict
+        self.sizeDict = sizeDict
         self.numAnneals = numAnneals
     
     def createTables(self):
@@ -37,7 +36,7 @@ class tablePlan:
         for i in range(self.seatingMap.shape[0]):
             for j in range(self.seatingMap.shape[1]):
                 if(self.seatingMap[i][j]!=0):
-                    tablesArr[i][j] = table(12, list, tableCounter)
+                    tablesArr[i][j] = table(12, list, 12, tableCounter)
                     tableCounter+=1
                 
         return tablesArr
@@ -53,3 +52,39 @@ class tablePlan:
                     knownPositions[table[k]] = ((i, j))
 
         return knownPositions
+
+    def randomizeTables(self):
+        sortedSizeDict = dict(sorted(self.sizeDict.items(), key=lambda item: item[1]))
+        sizes = np.array(list(sortedSizeDict.values()))
+        boundaryIdx, uniqueSizes = np.unique(sizes, return_index=True)
+
+        splitSizeDict = {}
+        for i in range(len(uniqueSizes)):
+            splitSizeDict[uniqueSizes[i]] = np.split([sizes, boundaryIdx[1:]])
+
+        uniqueSizesDesc = uniqueSizes[::-1]
+        arrangement = self.createTables()
+
+        for i in range(arrangement.shape[0]):
+            for j in range(arrangement.shape[1]):
+                canFitMore = True
+                while(canFitMore==True):
+                    for k in range(len(uniqueSizes)):
+                        size = arrangement[i][j].sizeCur
+                        adjUniqueSizes = size - uniqueSizesDesc
+                        if(adjUniqueSizes[k]>=0 and splitSizeDict[k].shape[0]>0):
+                            validMembers = splitSizeDict[k]
+                            member = np.random.choice(validMembers, size=1, replace=True)
+                            arrangement[i][j].members.append(member)
+                            arrangement[i][j].sizeCur -= uniqueSizes[k]
+                            break
+                        canFitMore = False
+
+
+
+
+
+
+        
+
+
